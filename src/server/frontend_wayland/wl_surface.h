@@ -144,6 +144,9 @@ public:
     void add_destroy_listener(void const* key, std::function<void()> listener);
     void remove_destroy_listener(void const* key);
 
+    void move_child_above_sibling(WlSubsurface* child, WlSubsurface* sibling);
+    void move_child_below_sibling(WlSubsurface* child, WlSubsurface* sibling);
+
     std::shared_ptr<scene::Session> const session;
     std::shared_ptr<compositor::BufferStream> const stream;
 

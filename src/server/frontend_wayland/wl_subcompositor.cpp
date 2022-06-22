@@ -128,14 +128,32 @@ void mf::WlSubsurface::set_position(int32_t x, int32_t y)
 
 void mf::WlSubsurface::place_above(struct wl_resource* sibling)
 {
-    (void)sibling;
-    log_warning("TODO: wl_subsurface.place_above not implemented");
+    void* raw_surface = wl_resource_get_user_data(sibling);
+    const auto sibling_surface = static_cast<WlSubsurface*>(static_cast<wayland::Subsurface*>(raw_surface));
+
+    if (!sibling_surface)
+    {
+        log_warning("Sibling surface is null");
+        return;
+    }
+
+    surface->move_child_above_sibling(this, sibling_surface);
 }
 
 void mf::WlSubsurface::place_below(struct wl_resource* sibling)
 {
-    (void)sibling;
-    log_warning("TODO: wl_subsurface.place_below not implemented");
+    void* raw_surface = wl_resource_get_user_data(sibling); 
+    const auto sibling_surface = static_cast<WlSubsurface*>(static_cast<wayland::Subsurface*>(raw_surface));
+
+    if (!sibling_surface)
+    {
+        log_warning("Sibling surface is null");
+        return;
+    }
+
+    // First I thought a one-liner doesn't justify a comment but I am certain
+    // it is: have children of a surface reordered
+    surface->move_child_below_sibling(this, sibling_surface);
 }
 
 void mf::WlSubsurface::set_sync()

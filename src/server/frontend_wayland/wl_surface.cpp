@@ -218,6 +218,67 @@ void mf::WlSurface::remove_destroy_listener(void const* key)
     destroy_listeners.erase(key);
 }
 
+void move_child(std::vector<mir::frontend::WlSubsurface*>::iterator from, std::vector<mir::frontend::WlSubsurface*>::iterator to)
+{
+    if (from < to) {
+        std::rotate(from, from+1, to+1);
+    } else if (from > to) {
+        std::rotate(to, from, from+1);
+    }
+}
+
+void mf::WlSurface::move_child_above_sibling(WlSubsurface* child, WlSubsurface* sibling)
+{
+    std::vector<WlSubsurface*>::iterator child_pos;
+    std::vector<WlSubsurface*>::iterator sibling_pos;
+
+    if (!child || !sibling)
+    {
+        log_warning("Invalid surface data provided for move_above");
+        return;
+    }
+
+    if ((child_pos = std::find(children.begin(), children.end(), child)) == children.end())
+    {
+        log_warning("Child subsurface not found among children");
+        return;
+    }
+
+    if ((sibling_pos = std::find(children.begin(), children.end(), sibling)) == children.end())
+    {
+        log_warning("Sibling subsurface not found among children");
+        return;
+    }
+
+    move_child(child_pos, sibling_pos + 1);
+}
+
+void mf::WlSurface::move_child_below_sibling(WlSubsurface* child, WlSubsurface* sibling)
+{
+    std::vector<WlSubsurface*>::iterator child_pos;
+    std::vector<WlSubsurface*>::iterator sibling_pos;
+
+    if (!child || !sibling)
+    {
+        log_warning("Invalid surface data provided for move_below");
+        return;
+    }
+
+    if ((child_pos = std::find(children.begin(), children.end(), child)) == children.end())
+    {
+        log_warning("Child subsurface not found among children");
+        return;
+    }
+
+    if ((sibling_pos = std::find(children.begin(), children.end(), sibling)) == children.end())
+    {
+        log_warning("Sibling subsurface not found among children");
+        return;
+    }
+
+    move_child(child_pos, sibling_pos - 1);
+}
+
 mf::WlSurface* mf::WlSurface::from(wl_resource* resource)
 {
     void* raw_surface = wl_resource_get_user_data(resource);
